@@ -1,3 +1,11 @@
+/* Name: 		Leger, Caleb
+ * Project:		PA-2 (Page-Replacement Algorithms
+ * File:		PageReplacement.java
+ * Instructor:	Feng Chen
+ * Class:		cs4103-sp15
+ * LogonID:		cs410323
+ */
+
 
 import java.util.*;
 
@@ -110,22 +118,22 @@ public class PageReplacement {
 		}
 		
 		public void print() {
-			Node current = tail;
+			Node current = head;
 			System.out.print("frame: ");
 			do {
 				System.out.print(current.data + " ");	
-				current = current.prev;
+				current = current.next;
 			} while(current != null);
 			System.out.println();
 		}
 		
 		// a method for debugging
 		public void printRecent() {
-			Node current = tail;
+			Node current = head;
 			System.out.print("recent: ");
 			do {
 				System.out.print(current.data + " ");	
-				current = current.prev;
+				current = current.next;
 			} while(current != null);
 			System.out.println();
 		}
@@ -273,7 +281,7 @@ public class PageReplacement {
 			CNode current = head;
 			System.out.print("Frame: ");
 			do {
-				System.out.print(current.data);
+				System.out.print(current.data + " ");
 				current = current.next;
 			} while (current != head);
 			System.out.println();
@@ -373,27 +381,41 @@ public class PageReplacement {
 			for (i = 0; i < sequence.length; i++) {
 				Cframe.current = Cframe.head;
 				refs++;
-				while (Cframe.current != null) {
+				int j = numFrames;
+				while (j > 0) {
+					// if frame is empty, add the page to the frame
+					if (Cframe.current.data == -1) {
+						Cframe.current.data = sequence[i];
+						Cframe.current.flag = 1;
+						Cframe.current = Cframe.current.next;
+						misses++;
+						j--;
+						break;
+					}
 					// if found
-					if (sequence[i] == Cframe.current.data) {
+					else if (Cframe.current.data == sequence[i]) {
 						hits++;
 						Cframe.current.flag = 1;
 						break;
 					}
+					// not found
 					else {
-						misses++;
 						if (Cframe.current.flag == 0) {
+							// if the page hasn't been recently used, evict it and replace it
+							// with the new page
 							Cframe.current.data = sequence[i];
+							Cframe.current.flag = 1;
 							break;
 						}
-						Cframe.current.flag = 0;
-						System.out.println("It's getting here");
-						Cframe.current = Cframe.current.next;
+						else {
+							Cframe.current.flag = 0;
+							Cframe.current = Cframe.current.next;
+						}
+						misses++;
 					}
-					System.out.println("It's getting here too");
-					Cframe.current = Cframe.current.next;
 				}
 				Cframe.print();
+				j--;
 			}
 			System.out.println("Total page references: " + refs);
 			System.out.println("Number of hits: " + hits);
