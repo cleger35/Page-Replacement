@@ -15,18 +15,29 @@ public class CList {
 	public CFrame tail;
 	public int size;
 	public CFrame current = head;
-//	public int numFrames;
+	public int numFrames;
 	
 	
 	public CList() {
 		head = null;
 		tail = null;
 		size = 0;
-//		numFrames = 1;
+		numFrames = 1;
+	}
+	
+	public CList(int numFrames) {
+		head = null;
+		tail = null;
+		size = 0;
+		numFrames = numFrames - 1;
 	}
 	
 	public boolean isEmpty() {
 		return head == null;
+	}
+	
+	public boolean isFull() {
+		return this.size == this.numFrames;
 	}
 	
 	
@@ -110,7 +121,19 @@ public class CList {
 			current = current.getNext();
 		}
 		size--;
-	}	
+	}
+	
+	public int getIndex(int d) {
+		int counter = 1;
+		CFrame temp = head;
+		while (temp.next != head) {
+			if (temp.data == d)
+				return counter;
+			counter++;
+			temp = temp.next;
+		}
+		return -1;
+	}
 	
 	public void print() {
 		CFrame current = head;
