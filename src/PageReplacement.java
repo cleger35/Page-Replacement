@@ -3,9 +3,9 @@ import java.util.*;
 
 public class PageReplacement {
 				
-	// ==================================================== //
-	//				LRU Data Structures						//
-	// ==================================================== //
+// ==================================================== //
+//				LRU Data Structures						//
+// ==================================================== //
 	
 	public class Node {
 		int data;
@@ -40,6 +40,7 @@ public class PageReplacement {
 			}
 			else 
 				head.prev = newNode;
+			
 			newNode.next = head;
 			head = newNode;
 		}
@@ -130,9 +131,9 @@ public class PageReplacement {
 		}
 	}
 		
-		// ==================================================== //
-		//				Clock Data Structures					//
-		// ==================================================== //
+// ==================================================== //
+//				Clock Data Structures					//
+// ==================================================== //
 		
 	public class CNode {
 		int data;
@@ -173,6 +174,7 @@ public class PageReplacement {
 		CNode head;
 		CNode tail;
 		int size;
+		CNode current = head;
 		
 		public CList() {
 			head = null;
@@ -219,18 +221,18 @@ public class PageReplacement {
 			
 		public void addAtIndex(int data, int pos) {
 			CNode newCNode = new CNode(data, null);
-			CNode index = head;
+			CNode current = head;
 			pos -= 1;
 			size++;
 			for (int i = 1; i < size - 1; i++) {
 				if (i == pos)
 				{
-					CNode tmp = index.getNext();
-					index.setNext(newCNode);
+					CNode tmp = current.getNext();
+					current.setNext(newCNode);
 					newCNode.setNext(tmp);
 					break;
 				}
-				index = index.getNext();
+				current = current.getNext();
 			}
 		}
 			
@@ -253,27 +255,27 @@ public class PageReplacement {
 				size --;
 				return;
 			}
-			CNode index = head;
+			CNode current = head;
 			pos -= 1;
 			for (int i = 1; i < size - 1; i++) {
 				if (i == pos) {
-					CNode tmp = index.getNext();
+					CNode tmp = current.getNext();
 					tmp = tmp.getNext();
-					index.setNext(tmp);
+					current.setNext(tmp);
 					break;
 				}
-				index = index.getNext();
+				current = current.getNext();
 			}
 			size--;
 		}	
 		
 		public void print() {
-			CNode index = head;
+			CNode current = head;
 			System.out.print("Frame: ");
 			do {
-				System.out.print(index.data);
-				index = index.next;
-			} while (index != head);
+				System.out.print(current.data);
+				current = current.next;
+			} while (current != head);
 			System.out.println();
 		}
 	}
@@ -361,28 +363,41 @@ public class PageReplacement {
 			// initialize the frames to -1
 			for (i = 0; i < numFrames; i++) {
 				Cframe.addFirst(-1);
+				Cframe.head.flag = 0;
 			}
+			System.out.println("Before any replacement: ");
 			Cframe.print();
+			System.out.println();
 			
 			// check for a hit
-			CNode index = Cframe.head;
 			for (i = 0; i < sequence.length; i++) {
+				Cframe.current = Cframe.head;
 				refs++;
-				while (index != null) {
+				while (Cframe.current != null) {
 					// if found
-					if (sequence[i] == index.data) {
+					if (sequence[i] == Cframe.current.data) {
 						hits++;
-						index.flag = 1;
+						Cframe.current.flag = 1;
 						break;
 					}
-					index.flag = 1;
-					index = index.next;
+					else {
+						misses++;
+						if (Cframe.current.flag == 0) {
+							Cframe.current.data = sequence[i];
+							break;
+						}
+						Cframe.current.flag = 0;
+						System.out.println("It's getting here");
+						Cframe.current = Cframe.current.next;
+					}
+					System.out.println("It's getting here too");
+					Cframe.current = Cframe.current.next;
 				}
+				Cframe.print();
 			}
-			
-
-			
-			
+			System.out.println("Total page references: " + refs);
+			System.out.println("Number of hits: " + hits);
+			System.out.println("Number of misses: " + misses);	
 		}
 		else System.out.println("You did not enter a valid algorithm"); // turn into try-catch
 	}
